@@ -1,0 +1,140 @@
+:root {
+    --num-size: 12px;
+    --animmation-state: paused;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #444;
+    color: #0bdc42;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+#ticket {
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+}
+
+#ticket .left {
+    display: grid;
+    gap: 4px;
+    grid-template-columns: repeat(10, 1fr);
+}
+
+#ticket .right {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    flex-direction: column;
+    margin-left: 10px;
+}
+
+#ticket .field {
+    display: grid;
+    min-width: auto;
+    grid-auto-flow: column;
+    gap: 1px;
+    padding: 4px;
+    background-color: #222;
+    position: relative;
+}
+
+#ticket .field .number {
+    display: none;
+    z-index: 10001;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    color: #f0f0f0;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 40px;
+    font-weight: bold;
+    text-align: center;
+    border: 2px solid #f0f0f0;
+}
+
+#ticket .left .field .number {
+    line-height: calc(var(--num-size) * 10);
+}
+
+#ticket .right .field .number {
+    line-height: calc(var(--num-size) * 3);
+}
+
+#ticket .left .field {
+    grid-template-columns: repeat(5, var(--num-size));
+    grid-template-rows: repeat(10, var(--num-size));
+}
+
+#ticket .right .field {
+    grid-template-columns: repeat(4, var(--num-size));
+    grid-template-rows: repeat(3, var(--num-size));
+}
+
+#ticket .field .lamp {
+    margin: 0 auto;
+    width: var(--num-size);
+    height: var(--num-size);
+    border-radius: calc(var(--num-size) / 2);
+    background-color: #0bdc42;
+    color: #eee;
+    animation-name: pump;
+    animation-duration: var(--animation-duration);
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-iteration-count: infinite;
+    animation-play-state: var(--animation-state);
+    animation-direction: normal;
+}
+
+.marked {
+    outline-offset: 2px;
+    outline-color: rgb(252, 40, 40);
+    outline-style: solid;
+    outline-width: 3px;
+    z-index: 10000;
+}
+
+button {
+    margin-top: 2em;
+    border: 1px solid #787878;
+    background-color: #e8e8e8;
+    padding: 0.5ex 0.5em;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #f8f8f8;
+}
+
+button:active {
+    background-color: #a0a0a0;
+}
+
+button:disabled {
+    background-color: #333;
+}
+
+@keyframes pump {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
