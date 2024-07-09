@@ -15,12 +15,10 @@
     function update() {
         if (!running)
             return;
-        const dt = (window.performance.now() - t0);
-        for (const lamp of allLamps) {
-            const delay = parseFloat(lamp.getAttribute('data-delay'));
-            const t = easing((Math.abs(delay - dt) % AnimationDurationMs) / AnimationDurationMs);
-            lamp.style.opacity = t;
-        }
+        const dt = window.performance.now() - t0;
+        allLamps.forEach(lamp => {
+            lamp.el.style.opacity = easing((Math.abs(lamp.offset - dt) % AnimationDurationMs) / AnimationDurationMs);
+        });
         window.requestAnimationFrame(update);
     }
 
@@ -50,7 +48,7 @@
                 lamp.el.parentElement.querySelector('.number').style.display = 'block';
             });
         };
-    
+
         running = false;
         markBrightestLamps('#ticket .left .field', 5);
         markBrightestLamps('#ticket .right .field', 2);
@@ -65,15 +63,17 @@
             const field = document.createElement('span');
             field.className = `field f${i}`;
             const number = document.createElement('span');
-            number.textContent = i + 1;
+            number.textContent = `${i + 1}`;
             number.className = 'number';
             field.append(number);
             for (let j = 0; j < 50; ++j) {
                 const lamp = document.createElement('span');
                 lamp.className = `lamp n${j}`;
-                lamp.setAttribute('data-delay', `${Math.random() * AnimationDurationMs}`);
                 field.append(lamp);
-                allLamps.push(lamp);
+                allLamps.push({
+                    el: lamp,
+                    offset: Math.random() * AnimationDurationMs,
+                });
             }
             el.left.append(field);
         }
@@ -83,15 +83,17 @@
             const field = document.createElement('span');
             field.className = `field f${i}`;
             const number = document.createElement('span');
-            number.textContent = i + 1;
+            number.textContent = `${i + 1}`;
             number.className = 'number';
             field.append(number);
             for (let j = 0; j < 12; ++j) {
                 const lamp = document.createElement('span');
                 lamp.className = `lamp n${j}`;
-                lamp.setAttribute('data-delay', `${Math.random() * AnimationDurationMs}`);
                 field.append(lamp);
-                allLamps.push(lamp);
+                allLamps.push({
+                    el: lamp,
+                    offset: Math.random() * AnimationDurationMs,
+                });
             }
             el.right.append(field);
         }
