@@ -45,7 +45,7 @@
                 return b.opacity - a.opacity;
             });
             brighestLamps.slice(0, n).forEach(lamp => {
-                lamp.el.parentElement.querySelector('.number').style.display = 'block';
+                lamp.el.parentElement.querySelector('.number').classList.add('visible');
             });
         };
 
