@@ -54,12 +54,6 @@
     
         running = false;
         const dt = (window.performance.now() - t0) % AnimationDurationMs;
-        if (el.root.style.getPropertyValue('--animation-state') === 'paused') {
-            el.root.style.setProperty('--animation-state', 'running');
-        }
-        else {
-            el.root.style.setProperty('--animation-state', 'paused');
-        }
         markBrightestLamps(dt, '#ticket .left .field', 5);
         markBrightestLamps(dt, '#ticket .right .field', 2);
         e.target.setAttribute('disabled', true);
@@ -68,9 +62,6 @@
     }
 
     function main() {
-        el.root = document.querySelector(':root');
-        el.root.style.setProperty('--animation-duration', `${AnimationDurationMs}ms`);
-
         el.left = document.querySelector('#ticket .left');
         for (let i = 0; i < 50; ++i) {
             const field = document.createElement('span');
