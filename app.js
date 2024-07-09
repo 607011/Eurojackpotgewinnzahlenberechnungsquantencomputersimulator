@@ -1,4 +1,10 @@
+/*
+   Copyright (c) 2024 Oliver Lau, oliver@ersatzworld.net
+*/
+
 (function (window) {
+    import('./mt.js');
+
     "use strict";
 
     const AnimationDurationMs = 451;
@@ -6,6 +12,7 @@
     let el = {};
     let allLamps = [];
     let running = true;
+    let rng = null;
 
     function upAndDownLinear(t) {
         return (t < 0.5) ? 2 * t : 1 - t;
@@ -58,6 +65,7 @@
     }
 
     function main() {
+        rng = new MersenneTwister(0xfeedc0de);
         el.left = document.querySelector('#ticket .left');
         for (let i = 0; i < 50; ++i) {
             const field = document.createElement('span');
@@ -72,7 +80,7 @@
                 field.append(lamp);
                 allLamps.push({
                     el: lamp,
-                    offset: Math.random() * AnimationDurationMs,
+                    offset: rng.random() * AnimationDurationMs,
                 });
             }
             el.left.append(field);
@@ -92,7 +100,7 @@
                 field.append(lamp);
                 allLamps.push({
                     el: lamp,
-                    offset: Math.random() * AnimationDurationMs,
+                    offset: rng.random() * AnimationDurationMs,
                 });
             }
             el.right.append(field);
