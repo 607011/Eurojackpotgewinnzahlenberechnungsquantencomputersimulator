@@ -1,23 +1,23 @@
 (function (window) {
     "use strict";
 
-    const AnimationDurationMs = 500;
+    const AnimationDurationMs = 451;
 
     let el = {};
     let allLamps = [];
-    let t0;
     let running = true;
 
-    function easing(t) {
+    function upAndDownLinear(t) {
         return (t < 0.5) ? 2 * t : 1 - t;
     }
 
-    function update() {
+    const easing = upAndDownLinear;
+
+    function update(t) {
         if (!running)
             return;
-        const dt = window.performance.now() - t0;
         allLamps.forEach(lamp => {
-            lamp.el.style.opacity = easing((Math.abs(lamp.offset - dt) % AnimationDurationMs) / AnimationDurationMs);
+            lamp.el.style.opacity = easing((Math.abs(lamp.offset - t) % AnimationDurationMs) / AnimationDurationMs);
         });
         window.requestAnimationFrame(update);
     }
@@ -61,14 +61,14 @@
         el.left = document.querySelector('#ticket .left');
         for (let i = 0; i < 50; ++i) {
             const field = document.createElement('span');
-            field.className = `field f${i}`;
+            field.className = 'field';
             const number = document.createElement('span');
             number.textContent = `${i + 1}`;
             number.className = 'number';
             field.append(number);
             for (let j = 0; j < 50; ++j) {
                 const lamp = document.createElement('span');
-                lamp.className = `lamp n${j}`;
+                lamp.className = 'lamp';
                 field.append(lamp);
                 allLamps.push({
                     el: lamp,
@@ -81,14 +81,14 @@
         el.right = document.querySelector('#ticket .right');
         for (let i = 0; i < 12; ++i) {
             const field = document.createElement('span');
-            field.className = `field f${i}`;
+            field.className =  'field';
             const number = document.createElement('span');
             number.textContent = `${i + 1}`;
             number.className = 'number';
             field.append(number);
             for (let j = 0; j < 12; ++j) {
                 const lamp = document.createElement('span');
-                lamp.className = `lamp n${j}`;
+                lamp.className = 'lamp';
                 field.append(lamp);
                 allLamps.push({
                     el: lamp,
@@ -103,7 +103,6 @@
         el.right.append(displayButton);
 
         window.requestAnimationFrame(update);
-        t0 = window.performance.now();
     }
 
     window.addEventListener('load', main);
