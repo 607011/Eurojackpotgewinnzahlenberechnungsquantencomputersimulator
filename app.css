@@ -38,7 +38,7 @@ body {
 #ticket .field {
     display: grid;
     min-width: auto;
-    grid-auto-flow: column;
+    grid-auto-flow: row;
     gap: 1px;
     padding: 4px;
     background-color: #222;
@@ -80,19 +80,12 @@ body {
 }
 
 #ticket .field .lamp {
-    margin: 0 auto;
+    display: inline-block;
     width: var(--num-size);
     height: var(--num-size);
     border-radius: calc(var(--num-size) / 2);
     background-color: #0bdc42;
     color: #eee;
-    animation-name: pump;
-    animation-duration: var(--animation-duration);
-    animation-timing-function: linear;
-    animation-fill-mode: both;
-    animation-iteration-count: infinite;
-    animation-play-state: var(--animation-state);
-    animation-direction: normal;
 }
 
 .marked {
@@ -123,18 +116,4 @@ button:active {
 
 button:disabled {
     background-color: #333;
-}
-
-@keyframes pump {
-    0% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0;
-    }
-
-    100% {
-        opacity: 1;
-    }
 }

@@ -4,52 +4,55 @@
     const AnimationDurationMs = 500;
 
     let el = {};
+    let allLamps = [];
     let t0;
+    let running = false;
 
-    function activate() {
-        const show = () => {
-            for (const lamp of document.querySelectorAll('.lamp')) {
-                lamp.style.visibility = 'visible';
-            }
-        };
-        for (const lamp of document.querySelectorAll('.lamp')) {
-            const delay = Math.random() * AnimationDurationMs;
-            lamp.setAttribute('data-delay', delay);
-            lamp.style.animationDelay = `${delay}ms`;
-        }
-        setTimeout(show, AnimationDurationMs);
-        t0 = window.performance.now();
+    function easing(t) {
+        return (t < 0.5) ? 2 * t : 1 - t;
     }
 
-    function markBrightestLamps(dt, selector, n) {
-        let brighestLamps = [];
-        for (const field of document.querySelectorAll(selector)) {
-            let leastDiff = Number.MAX_VALUE;
-            let brightestLamp = null;
-            for (const lamp of field.querySelectorAll('.lamp')) {
-                const delay = parseFloat(lamp.getAttribute('data-delay'));
-                const diff = Math.abs(delay - dt);
-                if (diff < leastDiff) {
-                    brightestLamp = lamp;
-                    leastDiff = diff;
-                }
-            }
-            brighestLamps.push({
-                dt: leastDiff,
-                el: brightestLamp,
-            });
-            brightestLamp.classList.add('marked');
+    function update() {
+        if (!running)
+            return;
+        const dt = (window.performance.now() - t0);
+        for (const lamp of allLamps) {
+            const delay = parseFloat(lamp.getAttribute('data-delay'));
+            const t = easing((Math.abs(delay - dt) % AnimationDurationMs) / AnimationDurationMs);
+            lamp.style.opacity = t;
         }
-        brighestLamps.sort((a, b) => {
-            return (a.dt < b.bt) ? -1 : (a.dt > b.dt) ? 1 : 0;
-        });
-        for (const brightestLamp of brighestLamps.slice(0, n)) {
-            
-            brightestLamp.el.parentElement.querySelector('.number').style.display = 'block';
-        }
+        window.requestAnimationFrame(update);
     }
 
     function measure(e) {
+        const markBrightestLamps = (dt, selector, n) => {
+            const t = easing(dt / AnimationDurationMs) * AnimationDurationMs;
+            let brighestLamps = [];
+            for (const field of document.querySelectorAll(selector)) {
+                let maxOpacity = Number.MIN_VALUE;
+                let brightestLamp = null;
+                for (const lamp of field.querySelectorAll('.lamp')) {
+                    const opacity = parseFloat(lamp.style.opacity);
+                    if (opacity > maxOpacity) {
+                        brightestLamp = lamp;
+                        maxOpacity = opacity;
+                    }
+                }
+                brighestLamps.push({
+                    opacity: maxOpacity,
+                    el: brightestLamp,
+                });
+                brightestLamp.classList.add('marked');
+            }
+            brighestLamps.sort((a, b) => {
+                return b.opacity - a.opacity;
+            });
+            brighestLamps.slice(0, n).forEach(lamp => {
+                lamp.el.parentElement.querySelector('.number').style.display = 'block';
+            });
+        };
+    
+        running = false;
         const dt = (window.performance.now() - t0) % AnimationDurationMs;
         if (el.root.style.getPropertyValue('--animation-state') === 'paused') {
             el.root.style.setProperty('--animation-state', 'running');
@@ -57,8 +60,6 @@
         else {
             el.root.style.setProperty('--animation-state', 'paused');
         }
-        console.debug(`dt = ${window.performance.now() - t0}`);
-        console.debug(`dt% = ${dt}`);
         markBrightestLamps(dt, '#ticket .left .field', 5);
         markBrightestLamps(dt, '#ticket .right .field', 2);
         e.target.setAttribute('disabled', true);
@@ -82,9 +83,10 @@
             for (let j = 0; j < 50; ++j) {
                 const lamp = document.createElement('span');
                 lamp.className = `lamp n${j}`;
-                lamp.style.visibility = 'hidden';
                 lamp.setAttribute('data-value', `${j + 1}`);
+                lamp.setAttribute('data-delay', `${Math.random() * AnimationDurationMs}`);
                 field.append(lamp);
+                allLamps.push(lamp);
             }
             el.left.append(field);
         }
@@ -101,19 +103,21 @@
             for (let j = 0; j < 12; ++j) {
                 const lamp = document.createElement('span');
                 lamp.className = `lamp n${j}`;
-                lamp.style.visibility = 'hidden';
                 lamp.setAttribute('data-value', `${j + 1}`);
+                lamp.setAttribute('data-delay', `${Math.random() * AnimationDurationMs}`);
                 field.append(lamp);
+                allLamps.push(lamp);
             }
             el.right.append(field);
         }
-
         const displayButton = document.createElement('button');
         displayButton.textContent = 'Messen';
         displayButton.addEventListener('click', measure);
         el.right.append(displayButton);
 
-        activate();
+        running = true;
+        window.requestAnimationFrame(update);
+        t0 = window.performance.now();
     }
 
     window.addEventListener('load', main);
