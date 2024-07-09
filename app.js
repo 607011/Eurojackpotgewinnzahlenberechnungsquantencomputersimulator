@@ -6,7 +6,7 @@
     let el = {};
     let allLamps = [];
     let t0;
-    let running = false;
+    let running = true;
 
     function easing(t) {
         return (t < 0.5) ? 2 * t : 1 - t;
@@ -25,8 +25,7 @@
     }
 
     function measure(e) {
-        const markBrightestLamps = (dt, selector, n) => {
-            const t = easing(dt / AnimationDurationMs) * AnimationDurationMs;
+        const markBrightestLamps = (selector, n) => {
             let brighestLamps = [];
             for (const field of document.querySelectorAll(selector)) {
                 let maxOpacity = Number.MIN_VALUE;
@@ -53,9 +52,8 @@
         };
     
         running = false;
-        const dt = (window.performance.now() - t0) % AnimationDurationMs;
-        markBrightestLamps(dt, '#ticket .left .field', 5);
-        markBrightestLamps(dt, '#ticket .right .field', 2);
+        markBrightestLamps('#ticket .left .field', 5);
+        markBrightestLamps('#ticket .right .field', 2);
         e.target.setAttribute('disabled', true);
         e.target.style.cursor = 'not-allowed';
         e.target.removeEventListener('click', measure);
@@ -66,7 +64,6 @@
         for (let i = 0; i < 50; ++i) {
             const field = document.createElement('span');
             field.className = `field f${i}`;
-            field.setAttribute('data-num', `${i + 1}`);
             const number = document.createElement('span');
             number.textContent = i + 1;
             number.className = 'number';
@@ -74,7 +71,6 @@
             for (let j = 0; j < 50; ++j) {
                 const lamp = document.createElement('span');
                 lamp.className = `lamp n${j}`;
-                lamp.setAttribute('data-value', `${j + 1}`);
                 lamp.setAttribute('data-delay', `${Math.random() * AnimationDurationMs}`);
                 field.append(lamp);
                 allLamps.push(lamp);
@@ -86,7 +82,6 @@
         for (let i = 0; i < 12; ++i) {
             const field = document.createElement('span');
             field.className = `field f${i}`;
-            field.setAttribute('data-num', `${i + 1}`);
             const number = document.createElement('span');
             number.textContent = i + 1;
             number.className = 'number';
@@ -94,7 +89,6 @@
             for (let j = 0; j < 12; ++j) {
                 const lamp = document.createElement('span');
                 lamp.className = `lamp n${j}`;
-                lamp.setAttribute('data-value', `${j + 1}`);
                 lamp.setAttribute('data-delay', `${Math.random() * AnimationDurationMs}`);
                 field.append(lamp);
                 allLamps.push(lamp);
@@ -106,7 +100,6 @@
         displayButton.addEventListener('click', measure);
         el.right.append(displayButton);
 
-        running = true;
         window.requestAnimationFrame(update);
         t0 = window.performance.now();
     }
