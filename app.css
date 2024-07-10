@@ -1,5 +1,5 @@
 :root {
-    --num-size: 12px;
+    --num-size: 4px;
 }
 
 * {
@@ -10,7 +10,15 @@
 
 body {
     background-color: #444;
-    color: #0bdc42;
+    color: #11b43d;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+#fps {
+    text-align: right;
+    font-size: 12px;
+    font-weight: bold;
+    margin-top: 5px;
 }
 
 #ticket {
@@ -57,7 +65,7 @@ body {
     color: #f0f0f0;
     user-select: none;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 40px;
+    font-size: calc(var(--num-size) * 4);
     font-weight: bold;
     text-align: center;
     text-shadow: black 0 0 4px;
@@ -132,4 +140,14 @@ button:active {
 
 button:disabled {
     background-color: #333;
+}
+
+footer {
+    padding: 4px 10px;
+    width: calc(var(--num-size) * 50);
+    display: block;
+}
+
+footer > * {
+    margin-right: 14px;
 }

@@ -20,12 +20,21 @@
 
     const easing = upAndDownLinear;
 
+    const fps = new Array(5).fill(0);
+    let lastT = 0;
+    let tIdx = 0;
+
     function update(t) {
         if (!running)
             return;
         allLamps.forEach(lamp => {
             lamp.el.style.opacity = easing((Math.abs(lamp.offset - t) % AnimationDurationMs) / AnimationDurationMs);
         });
+        fps[tIdx++] = 1000 / (t - lastT);
+        if (tIdx === fps.length)
+            tIdx = 0;
+        lastT = t;
+        el.fps.textContent = `${Math.round(fps.reduce((a, b) => a + b, 0) / fps.length)}/s`;
         window.requestAnimationFrame(update);
     }
 
@@ -105,10 +114,10 @@
             }
             el.right.append(field);
         }
-        const displayButton = document.createElement('button');
-        displayButton.textContent = 'Messen';
-        displayButton.addEventListener('click', measure);
-        el.right.append(displayButton);
+
+        el.measureButton = document.querySelector('#measure-button');
+        el.measureButton.addEventListener('click', measure);
+        el.fps = document.querySelector('#fps');
 
         window.requestAnimationFrame(update);
     }
