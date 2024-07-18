@@ -10,4 +10,4 @@ https://github.com/607011/Eurojackpotgewinnzahlenberechnungsquantencomputersimul
 
 Du schuldest mir 4,51 Prozent deines Gewinns über 1000 Euro, wenn du mit den Zahlen gewinnst, die diese Anwendung ausspuckt. 
 
-**[Jetzt die Gewinnzahlen ermitteln!](https://607011.github.io/Eurolottogewinnzahlenberechnungsquantencomputer/)**
+**[Jetzt die Gewinnzahlen ermitteln!](https://607011.github.io/Eurojackpotgewinnzahlenberechnungsquantencomputersimulator/)**
