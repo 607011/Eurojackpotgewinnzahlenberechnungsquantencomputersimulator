@@ -3,8 +3,6 @@
 */
 
 (function (window) {
-    import('./mt.js');
-
     "use strict";
 
     const AnimationDurationMs = 451;
@@ -12,7 +10,6 @@
     let el = {};
     let allLamps = [];
     let running = true;
-    let rng = null;
 
     function upAndDownLinear(t) {
         return (t < 0.5) ? 2 * t : 1 - t;
@@ -71,49 +68,71 @@
         e.target.setAttribute('disabled', true);
         e.target.style.cursor = 'not-allowed';
         e.target.removeEventListener('click', measure);
+        el.fps.style.display = 'none';
+    }
+
+    let well1024;
+
+    async function loadWASM() {
+        let wasmImports = {};
+        let importObject = {
+            'env': wasmImports,
+            'wasi_snapshot_preview1': wasmImports,
+        };
+        const { instance } = await WebAssembly.instantiateStreaming(fetch('WELL/well.wasm'), importObject);
+        const fillStateArray = instance.exports.fill_state_array;
+        well1024 = instance.exports.WELL1024;
+        const WELL_R = instance.exports.bufsize();
+        const memory = instance.exports.memory;
+        const view = new Uint32Array(memory.buffer);
+        for (let i = 0; i < WELL_R; ++i) {
+            view[i] = Math.floor(Math.random() * 0xFFFFFFFF);
+        }
+        fillStateArray(view.byteOffset);
     }
 
     function main() {
-        rng = new MersenneTwister(0xfeedc0de);
-        el.left = document.querySelector('#ticket .left');
-        for (let i = 0; i < 50; ++i) {
-            const field = document.createElement('span');
-            field.className = 'field';
-            const number = document.createElement('span');
-            number.textContent = `${i + 1}`;
-            number.className = 'number';
-            field.append(number);
-            for (let j = 0; j < 50; ++j) {
-                const lamp = document.createElement('span');
-                lamp.className = 'lamp';
-                field.append(lamp);
-                allLamps.push({
-                    el: lamp,
-                    offset: rng.random() * AnimationDurationMs,
-                });
+        loadWASM().then(() => { 
+            el.left = document.querySelector('#ticket .left');
+            for (let i = 0; i < 50; ++i) {
+                const field = document.createElement('span');
+                field.className = 'field';
+                const number = document.createElement('span');
+                number.textContent = `${i + 1}`;
+                number.className = 'number';
+                field.append(number);
+                for (let j = 0; j < 50; ++j) {
+                    const lamp = document.createElement('span');
+                    lamp.className = 'lamp';
+                    field.append(lamp);
+                    allLamps.push({
+                        el: lamp,
+                        offset: well1024() % AnimationDurationMs,
+                    });
+                }
+                el.left.append(field);
             }
-            el.left.append(field);
-        }
-
-        el.right = document.querySelector('#ticket .right');
-        for (let i = 0; i < 12; ++i) {
-            const field = document.createElement('span');
-            field.className =  'field';
-            const number = document.createElement('span');
-            number.textContent = `${i + 1}`;
-            number.className = 'number';
-            field.append(number);
-            for (let j = 0; j < 12; ++j) {
-                const lamp = document.createElement('span');
-                lamp.className = 'lamp';
-                field.append(lamp);
-                allLamps.push({
-                    el: lamp,
-                    offset: rng.random() * AnimationDurationMs,
-                });
+    
+            el.right = document.querySelector('#ticket .right');
+            for (let i = 0; i < 12; ++i) {
+                const field = document.createElement('span');
+                field.className = 'field';
+                const number = document.createElement('span');
+                number.textContent = `${i + 1}`;
+                number.className = 'number';
+                field.append(number);
+                for (let j = 0; j < 12; ++j) {
+                    const lamp = document.createElement('span');
+                    lamp.className = 'lamp';
+                    field.append(lamp);
+                    allLamps.push({
+                        el: lamp,
+                        offset: well1024() % AnimationDurationMs,
+                    });
+                }
+                el.right.append(field);
             }
-            el.right.append(field);
-        }
+        });
 
         el.measureButton = document.querySelector('#measure-button');
         el.measureButton.addEventListener('click', measure);
@@ -121,6 +140,6 @@
 
         window.requestAnimationFrame(update);
     }
-
     window.addEventListener('load', main);
+
 })(window);

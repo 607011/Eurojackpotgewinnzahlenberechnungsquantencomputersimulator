@@ -74,7 +74,7 @@
 class MersenneTwister {
 
     constructor(seed) {
-        this.seed = (typeof seed === 'undefined')
+        seed = (typeof seed === 'undefined')
             ? new Date().getTime()
             : seed;
         /* Period parameters */
