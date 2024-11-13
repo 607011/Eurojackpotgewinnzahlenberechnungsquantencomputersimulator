@@ -71,75 +71,84 @@
         el.fps.style.display = 'none';
     }
 
-    let well1024;
+    const mt = {
+        randint: null,
+        seed: null,
+        seed_seq: null,
+    };
+
+    let instance = null;
 
     async function loadWASM() {
-        let wasmImports = {};
-        let importObject = {
-            'env': wasmImports,
-            'wasi_snapshot_preview1': wasmImports,
-        };
-        const { instance } = await WebAssembly.instantiateStreaming(fetch('WELL/well.wasm'), importObject);
-        const fillStateArray = instance.exports.fill_state_array;
-        well1024 = instance.exports.WELL1024;
-        const WELL_R = instance.exports.bufsize();
-        const memory = instance.exports.memory;
-        const view = new Uint32Array(memory.buffer);
-        for (let i = 0; i < WELL_R; ++i) {
-            view[i] = Math.floor(Math.random() * 0xFFFFFFFF);
+        try {
+            instance = (await WebAssembly.instantiateStreaming(fetch('MT/MT.wasm'))).instance;
         }
-        fillStateArray(view.byteOffset);
+        catch (e) {
+            console.error(e);
+        }
+        mt.n = instance.exports.n();
+        mt.seed = instance.exports.init_genrand;
+        mt.seed_seq = instance.exports.init_by_array;
+        mt.randint = instance.exports.genrand_int31;
+    }
+
+    async function init() {
+        const BUFSIZE = mt.n;
+        const seeds = new Uint32Array(BUFSIZE);
+        crypto.getRandomValues(seeds);
+        const memory = instance.exports.memory;
+        const memView = new Uint32Array(memory.buffer);
+        seeds.forEach((val, idx) => memView[idx] = val);
+        mt.seed_seq(memView.byteOffset, BUFSIZE);
+
+        el.left = document.querySelector('#ticket .left');
+        for (let i = 0; i < 50; ++i) {
+            const field = document.createElement('span');
+            field.className = 'field';
+            const number = document.createElement('span');
+            number.textContent = `${i + 1}`;
+            number.className = 'number';
+            field.append(number);
+            for (let j = 0; j < 50; ++j) {
+                const lamp = document.createElement('span');
+                lamp.className = 'lamp';
+                field.append(lamp);
+                allLamps.push({
+                    el: lamp,
+                    offset: mt.randint() % AnimationDurationMs,
+                });
+            }
+            el.left.append(field);
+        }
+
+        el.right = document.querySelector('#ticket .right');
+        for (let i = 0; i < 12; ++i) {
+            const field = document.createElement('span');
+            field.className = 'field';
+            const number = document.createElement('span');
+            number.textContent = `${i + 1}`;
+            number.className = 'number';
+            field.append(number);
+            for (let j = 0; j < 12; ++j) {
+                const lamp = document.createElement('span');
+                lamp.className = 'lamp';
+                field.append(lamp);
+                allLamps.push({
+                    el: lamp,
+                    offset: mt.randint() % AnimationDurationMs,
+                });
+            }
+            el.right.append(field);
+        }
     }
 
     function main() {
-        loadWASM().then(() => { 
-            el.left = document.querySelector('#ticket .left');
-            for (let i = 0; i < 50; ++i) {
-                const field = document.createElement('span');
-                field.className = 'field';
-                const number = document.createElement('span');
-                number.textContent = `${i + 1}`;
-                number.className = 'number';
-                field.append(number);
-                for (let j = 0; j < 50; ++j) {
-                    const lamp = document.createElement('span');
-                    lamp.className = 'lamp';
-                    field.append(lamp);
-                    allLamps.push({
-                        el: lamp,
-                        offset: well1024() % AnimationDurationMs,
-                    });
-                }
-                el.left.append(field);
-            }
-    
-            el.right = document.querySelector('#ticket .right');
-            for (let i = 0; i < 12; ++i) {
-                const field = document.createElement('span');
-                field.className = 'field';
-                const number = document.createElement('span');
-                number.textContent = `${i + 1}`;
-                number.className = 'number';
-                field.append(number);
-                for (let j = 0; j < 12; ++j) {
-                    const lamp = document.createElement('span');
-                    lamp.className = 'lamp';
-                    field.append(lamp);
-                    allLamps.push({
-                        el: lamp,
-                        offset: well1024() % AnimationDurationMs,
-                    });
-                }
-                el.right.append(field);
-            }
-        });
-
         el.measureButton = document.querySelector('#measure-button');
         el.measureButton.addEventListener('click', measure);
         el.fps = document.querySelector('#fps');
-
-        window.requestAnimationFrame(update);
+        loadWASM().then(init).then(update);
     }
+
     window.addEventListener('load', main);
 
 })(window);

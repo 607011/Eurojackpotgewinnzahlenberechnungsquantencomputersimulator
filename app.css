@@ -102,7 +102,7 @@ body {
     display: inline-block;
     width: var(--num-size);
     height: var(--num-size);
-    border-radius: calc(var(--num-size) / 2);
+    border-radius: 50%;
     background-color: #0bdc42;
     color: #eee;
     transition-property: outline;
