@@ -46,12 +46,6 @@
 
 #include <emscripten.h>
 
-#ifdef __cplusplus
-#define EXTERN extern "C"
-#else
-#define EXTERN
-#endif
-
 /* Period parameters */
 #define N 624
 #define M 397
@@ -62,10 +56,10 @@
 static unsigned long mt[N]; /* the array for the state vector  */
 static int mti = N + 1;     /* mti==N+1 means mt[N] is not initialized */
 
-EXTERN EMSCRIPTEN_KEEPALIVE int n() { return N; }
+EMSCRIPTEN_KEEPALIVE int n() { return N; }
 
 /* initializes mt[N] with a seed */
-EXTERN EMSCRIPTEN_KEEPALIVE void init_genrand(unsigned long s) {
+EMSCRIPTEN_KEEPALIVE void init_genrand(unsigned long s) {
   mt[0] = s & 0xffffffffUL;
   for (mti = 1; mti < N; mti++) {
     mt[mti] = (1812433253UL * (mt[mti - 1] ^ (mt[mti - 1] >> 30)) + mti);
@@ -82,8 +76,8 @@ EXTERN EMSCRIPTEN_KEEPALIVE void init_genrand(unsigned long s) {
 /* init_key is the array for initializing keys */
 /* key_length is its length */
 /* slight change for C++, 2004/2/26 */
-EXTERN EMSCRIPTEN_KEEPALIVE void init_by_array(unsigned long init_key[],
-                                               int key_length) {
+EMSCRIPTEN_KEEPALIVE void init_by_array(unsigned long init_key[],
+                                        int key_length) {
   int i, j, k;
   init_genrand(19650218UL);
   i = 1;
@@ -117,7 +111,7 @@ EXTERN EMSCRIPTEN_KEEPALIVE void init_by_array(unsigned long init_key[],
 }
 
 /* generates a random number on [0,0xffffffff]-interval */
-EXTERN EMSCRIPTEN_KEEPALIVE unsigned long genrand_int32(void) {
+EMSCRIPTEN_KEEPALIVE unsigned long genrand_int32(void) {
   unsigned long y;
   static unsigned long mag01[2] = {0x0UL, MATRIX_A};
   /* mag01[x] = x * MATRIX_A  for x=0,1 */
@@ -153,6 +147,6 @@ EXTERN EMSCRIPTEN_KEEPALIVE unsigned long genrand_int32(void) {
   return y;
 }
 
-EXTERN EMSCRIPTEN_KEEPALIVE long genrand_int31(void) {
+EMSCRIPTEN_KEEPALIVE unsigned long genrand_int31(void) {
   return genrand_int32() >> 1;
 }
