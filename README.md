@@ -1,4 +1,4 @@
-# Eurojackpotgewinnzahlenberechnungsquantencomputersimulation
+# Eurojackpotgewinnzahlenberechnungsquantencomputersimulator
 
 **Simulation eines Quantencomputers, der die Gewinnzahlen der nächsten Eurojackpot-Ziehung ermittelt**
 
