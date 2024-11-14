@@ -1,12 +1,13 @@
 .PHONY: all clean
 
-CFLAGS=-Os
-EMCCFLAGS=--no-entry
+CFLAGS=-O3
+EMCCFLAGS=--no-entry -sEXPORTED_FUNCTIONS='["_n", "_opacity", "_init_genrand", "_init_by_array", "_genrand_int32", "_genrand_int31"]'
+SRC=mt19937.c aux.c
 
-all: mt.js
+all: mt.wasm
 
-mt.js: mt19937.c Makefile
-	emcc mt19937.c $(EMCCFLAGS) $(CFLAGS) -o mt.js
+mt.wasm: $(SRC) Makefile
+	emcc $(SRC) $(EMCCFLAGS) $(CFLAGS) -o mt.wasm
 
 clean:
 	rm -f mt.wasm mt.js
